@@ -89,7 +89,7 @@ void ttest_beginTestSuite(const char *desc, int skip) {
     testSuiteStack.len++;
 }
 
-void ttest_ceaseTestSuite() {
+void ttest_endTestSuite() {
     if (!initialized) {
         ERROR(NOT_INITIALIZED_ERROR_MESSAGE);
     }
@@ -167,7 +167,7 @@ void ttest_beginTest(const char *desc, int failAsPassFlag, int skip) {
     );
 }
 
-void ttest_ceaseTest() {
+void ttest_endTest() {
     if (!initialized) {
         ERROR(NOT_INITIALIZED_ERROR_MESSAGE);
     }
@@ -178,7 +178,7 @@ void ttest_ceaseTest() {
 
     struct ttest_TestSuite *currTestSuite = testSuiteStack.ptr - 1;
     if (currTestSuite->test.status == ttest_NONE) {
-        ERROR("No test is running, call ttest_ceaseTest if there is a test running");
+        ERROR("No test is running, call ttest_endTest if there is a test running");
     }
 
     if (currCleanFunc != NULL) {
@@ -220,8 +220,8 @@ void ttest_conclude() {
         duration
     );
 
-    initialized = 0;
-    free(testSuiteStack.ptr);
+    // initialized = 0;
+    // free(testSuiteStack.ptr);
 }
 
 void ttest_assert(int expr) {

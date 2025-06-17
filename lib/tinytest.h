@@ -43,21 +43,21 @@ void ttest_clean(ttest_cleanFunc cleanFunc);
 #define CLEAN(func) ttest_clean(&func)
 
 void ttest_beginTestSuite(const char *desc, int skip);
-void ttest_ceaseTestSuite();
+void ttest_endTestSuite();
 #define DESCRIBE(desc, block) ttest_beginTestSuite(desc, 0); \
     { block }; \
-    ttest_ceaseTestSuite()
+    ttest_endTestSuite()
 #define DESCRIBE_SKIP(desc, block) ttest_beginTestSuite(desc, 1)
 
 void ttest_beginTest(const char *desc, int failAsPassFlag, int skip);
-void ttest_ceaseTest();
+void ttest_endTest();
 #define IT(desc, block) ttest_beginTest(desc, 0, 0); \
     { block }; \
-    ttest_ceaseTest()
+    ttest_endTest()
 #define IT_SKIP(desc, block) ttest_beginTest(desc, 0, 1)
 #define IT_FAIL(desc, block) ttest_beginTest(desc, 1, 0); \
     { block }; \
-    ttest_ceaseTest()
+    ttest_endTest()
 
 void ttest_conclude();
 #define CONCLUDE() ttest_conclude();
