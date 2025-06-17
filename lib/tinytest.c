@@ -71,10 +71,10 @@ void ttest_beginTestSuite(const char *desc, int skip) {
 
     if (testSuiteStack.len == 0) {
         if (skip) {
-            printf("==== %s # SKIP\n", desc);
+            printf("\n@@@@ %s # SKIP\n", desc);
             return;
         } else {
-            printf("==== %s\n", desc);
+            printf("\n@@@@ %s\n", desc);
         }
     } else {
         if ((testSuiteStack.ptr - 1)->test.status != ttest_NONE) {
@@ -82,10 +82,10 @@ void ttest_beginTestSuite(const char *desc, int skip) {
         }
 
         if (skip) {
-            printf("==== %s >> %s # SKIP\n", (testSuiteStack.ptr - 1)->desc, desc);
+            printf("\n@@@@ %s :: %s # SKIP\n", (testSuiteStack.ptr - 1)->desc, desc);
             return;
         } else {
-            printf("==== %s >> %s\n", (testSuiteStack.ptr - 1)->desc, desc);
+            printf("\n@@@@ %s :: %s\n", (testSuiteStack.ptr - 1)->desc, desc);
         }
     }
 
@@ -115,7 +115,7 @@ void ttest_endTestSuite() {
     }
 
     if (testSuiteStack.len == 1) {
-        printf("\n%s @ %d pass, %d fail, %d skip ... DONE (%lums)\n\n",
+        printf("\n!!!! %s # DONE :: %d pass, %d fail, %d skip (%lums) !!!!\n\n",
             currTestSuite->desc,
             currTestSuite->totalPass,
             currTestSuite->totalFail,
@@ -134,7 +134,8 @@ void ttest_endTestSuite() {
         parentTestSuite->totalSkip += currTestSuite->totalSkip;
         parentTestSuite->totalDuration += currTestSuite->totalDuration;
 
-        printf("----- %s @ DONE (%lums)\n",
+        printf("==== %s :: %s # DONE (%lums)\n",
+            (currTestSuite - 1)->desc,
             currTestSuite->desc,
             currTestSuite->totalDuration
         );
@@ -159,7 +160,7 @@ void ttest_beginTest(const char *desc, int failAsPassFlag, int skip) {
     }
 
     if (skip) {
-        printf("----- %s >>> %s\n      # SKIP (0ms)\n",
+        printf("---- %s ::> %s\n      # SKIP (0ms)\n",
             currTestSuite->desc,
             desc
         );
@@ -171,7 +172,7 @@ void ttest_beginTest(const char *desc, int failAsPassFlag, int skip) {
     currTestSuite->test.failAsPassFlag = failAsPassFlag;
     currTestSuite->test.status = ttest_PASS;
     currTestSuite->test.startClock = clock();
-    printf("----- %s >>> %s\n",
+    printf("---- %s ::> %s\n",
         currTestSuite->desc,
         desc
     );

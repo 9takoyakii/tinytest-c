@@ -74,5 +74,4 @@ void ttest_conclude();
 int ttest_assert(int expr);
 #define ASSERT(expr) ttest_assert(expr);
 
-
 #endif
