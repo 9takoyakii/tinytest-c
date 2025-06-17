@@ -252,6 +252,7 @@ int ttest_assert(int expr) {
         ERROR("No test is running, call ttest_assert / ASSERT if there is a test running");
     }
 
-    currTestSuite->test.status = expr ^ currTestSuite->test.failAsPassFlag ? ttest_PASS : ttest_FAIL;
+    int isPass = (currTestSuite->test.status == ttest_PASS) && (expr ^ currTestSuite->test.failAsPassFlag);
+    currTestSuite->test.status = isPass ? ttest_PASS : ttest_FAIL;
     return expr;
 }
