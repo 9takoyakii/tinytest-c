@@ -40,7 +40,6 @@ void ttest_init() {
     testSuiteStack.nextPtr = calloc(TEST_SUITE_MAX_DEPTH, sizeof(struct ttest_TestSuite));
 }
 
-// TODO: Buat sistem cleanup bersarang untuk lebih kompleks.
 void ttest_cleanUp(ttest_cleanupFunc *cleanFunc) {
     if (testSuiteStack.len == 0) {
         rootcleanupFunc = cleanFunc;
