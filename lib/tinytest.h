@@ -3,7 +3,8 @@
 //              for the C programming language.
 //
 // Repo: https://github.com/9takoyakii/tinytest-c
-// SPDX-License-Identifier: WTFPL
+// Version: 3a192212cb2ffbcb39088acfafe3896be2e386b4
+// SPDX-License-Identifier: WTFP
 //
 
 #ifndef __TINY_TEST_C
