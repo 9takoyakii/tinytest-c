@@ -17,7 +17,7 @@
     exit(1)
 #define TEST_SUITE_MAX_DEPTH 4
 
-static ttest_cleanFunc *currCleanFunc = NULL;
+static ttest_cleanupFunc *rootcleanupFunc = NULL;
 static int initialized = 0;
 static int concluded = 0;
 static int totalPass;
@@ -27,20 +27,8 @@ static long int totalDuration;
 static struct ttest_TestSuiteStack testSuiteStack = {
     .cap = TEST_SUITE_MAX_DEPTH,
     .len = 0,
-    .ptr = NULL,
+    .nextPtr = NULL,
 };
-
-static void updateStat(int pass, int fail, int skip) {
-    totalPass += pass;
-    totalFail += fail;
-    totalSkip += skip;
-
-    for (size_t i = testSuiteStack.len; i != 0; i--) {
-        testSuiteStack.ptr[i - 1].totalPass += pass;
-        testSuiteStack.ptr[i - 1].totalFail += fail;
-        testSuiteStack.ptr[i - 1].totalSkip += skip;
-    }
-}
 
 void ttest_init() {
     if (initialized) {
@@ -49,15 +37,20 @@ void ttest_init() {
 
     initialized = 1;
     testSuiteStack.len = 0;
-    testSuiteStack.ptr = calloc(TEST_SUITE_MAX_DEPTH, sizeof(struct ttest_TestSuite));
+    testSuiteStack.nextPtr = calloc(TEST_SUITE_MAX_DEPTH, sizeof(struct ttest_TestSuite));
 }
 
-void ttest_clean(ttest_cleanFunc *cleanFunc) {
-    if (currCleanFunc != NULL) {
-        ERROR("Don't call the ttest_clean / CLEAN twice");
+// TODO: Buat sistem cleanup bersarang untuk lebih kompleks.
+void ttest_cleanUp(ttest_cleanupFunc *cleanFunc) {
+    if (testSuiteStack.len == 0) {
+        rootcleanupFunc = cleanFunc;
+    } else {
+        struct ttest_TestSuite *currTestSuite = testSuiteStack.nextPtr - 1;
+        if (currTestSuite->test.status != ttest_NONE) {
+            ERROR("Don't call ttest_cleanUp / CLEANUP when test is running");
+        }
+        currTestSuite->cleanupFunc = cleanFunc;
     }
-
-    currCleanFunc = cleanFunc;
 }
 
 void ttest_beginTestSuite(const char *desc, int skip) {
@@ -77,25 +70,25 @@ void ttest_beginTestSuite(const char *desc, int skip) {
             printf("\n@@@@ %s\n", desc);
         }
     } else {
-        if ((testSuiteStack.ptr - 1)->test.status != ttest_NONE) {
+        if ((testSuiteStack.nextPtr - 1)->test.status != ttest_NONE) {
             ERROR("There are still tests running, unable to create a new test suite");
         }
 
         if (skip) {
-            printf("\n@@@@ %s :: %s # SKIP\n", (testSuiteStack.ptr - 1)->desc, desc);
+            printf("\n@@@@ %s :: %s # SKIP\n", (testSuiteStack.nextPtr - 1)->desc, desc);
             return;
         } else {
-            printf("\n@@@@ %s :: %s\n", (testSuiteStack.ptr - 1)->desc, desc);
+            printf("\n@@@@ %s :: %s\n", (testSuiteStack.nextPtr - 1)->desc, desc);
         }
     }
 
-    testSuiteStack.ptr->desc = desc;
-    testSuiteStack.ptr->totalSkip = 0;
-    testSuiteStack.ptr->totalFail = 0;
-    testSuiteStack.ptr->totalPass = 0;
-    testSuiteStack.ptr->test.status = ttest_NONE;
-    testSuiteStack.ptr->totalDuration = 0;
-    testSuiteStack.ptr++;
+    testSuiteStack.nextPtr->desc = desc;
+    testSuiteStack.nextPtr->totalSkip = 0;
+    testSuiteStack.nextPtr->totalFail = 0;
+    testSuiteStack.nextPtr->totalPass = 0;
+    testSuiteStack.nextPtr->test.status = ttest_NONE;
+    testSuiteStack.nextPtr->totalDuration = 0;
+    testSuiteStack.nextPtr++;
     testSuiteStack.len++;
 }
 
@@ -109,7 +102,7 @@ void ttest_endTestSuite() {
     }
 
 
-    struct ttest_TestSuite *currTestSuite = testSuiteStack.ptr - 1;
+    struct ttest_TestSuite *currTestSuite = testSuiteStack.nextPtr - 1;
     if (currTestSuite->test.status != ttest_NONE) {
         ERROR("There are still tests running, unable to cease current test suite");
     }
@@ -128,7 +121,7 @@ void ttest_endTestSuite() {
         totalSkip += currTestSuite->totalSkip;
         totalDuration += currTestSuite->totalDuration;
     } else {
-        struct ttest_TestSuite *parentTestSuite = testSuiteStack.ptr - 2;
+        struct ttest_TestSuite *parentTestSuite = testSuiteStack.nextPtr - 2;
         parentTestSuite->totalPass += currTestSuite->totalPass;
         parentTestSuite->totalFail += currTestSuite->totalFail;
         parentTestSuite->totalSkip += currTestSuite->totalSkip;
@@ -141,7 +134,7 @@ void ttest_endTestSuite() {
         );
     }
 
-    testSuiteStack.ptr--;
+    testSuiteStack.nextPtr--;
     testSuiteStack.len--;
 }
 
@@ -154,7 +147,7 @@ void ttest_beginTest(const char *desc, int failAsPassFlag, int skip) {
         ERROR("No test suite running");
     }
 
-    struct ttest_TestSuite *currTestSuite = testSuiteStack.ptr - 1;
+    struct ttest_TestSuite *currTestSuite = testSuiteStack.nextPtr - 1;
     if (currTestSuite->test.status != ttest_NONE) {
         ERROR("There is a test running, can only run 1 test at a time");
     }
@@ -187,13 +180,20 @@ void ttest_endTest() {
         ERROR("No test suite running");
     }
 
-    struct ttest_TestSuite *currTestSuite = testSuiteStack.ptr - 1;
+    struct ttest_TestSuite *currTestSuite = testSuiteStack.nextPtr - 1;
     if (currTestSuite->test.status == ttest_NONE) {
         ERROR("No test is running, call ttest_endTest if there is a test running");
     }
 
-    if (currCleanFunc != NULL) {
-        currCleanFunc(&currTestSuite->test);
+    for (size_t i = 1; i <= testSuiteStack.len; i++) {
+        struct ttest_TestSuite *t = testSuiteStack.nextPtr - i;
+        if (t->cleanupFunc != NULL) {
+            t->cleanupFunc(&currTestSuite->test);
+        }
+    }
+
+    if (rootcleanupFunc != NULL) {
+        rootcleanupFunc(&currTestSuite->test);
     }
 
     enum ttest_TEST_STATUS status = currTestSuite->test.status;
@@ -235,7 +235,7 @@ void ttest_conclude() {
     );
 
     concluded = 1;
-    free(testSuiteStack.ptr);
+    free(testSuiteStack.nextPtr);
 }
 
 int ttest_assert(int expr) {
@@ -247,7 +247,7 @@ int ttest_assert(int expr) {
         ERROR("No test suite running");
     }
 
-    struct ttest_TestSuite *currTestSuite = testSuiteStack.ptr - 1;
+    struct ttest_TestSuite *currTestSuite = testSuiteStack.nextPtr - 1;
     if (currTestSuite->test.status == ttest_NONE) {
         ERROR("No test is running, call ttest_assert / ASSERT if there is a test running");
     }

@@ -28,6 +28,8 @@ struct ttest_Test {
     long startClock;
 };
 
+typedef void ttest_cleanupFunc(const struct ttest_Test *test);
+
 struct ttest_TestSuite {
     const char *desc;
     struct ttest_Test test;
@@ -35,21 +37,20 @@ struct ttest_TestSuite {
     int totalFail;
     int totalSkip;
     long totalDuration;
+    ttest_cleanupFunc *cleanupFunc;
 };
 
 struct ttest_TestSuiteStack {
-    struct ttest_TestSuite *ptr;
+    struct ttest_TestSuite *nextPtr;
     size_t cap;
     size_t len;
 };
 
-typedef void ttest_cleanFunc(const struct ttest_Test *test);
-
 void ttest_init();
 #define INIT() ttest_init()
 
-void ttest_clean(ttest_cleanFunc cleanFunc);
-#define CLEAN(func) ttest_clean(&func)
+void ttest_cleanUp(ttest_cleanupFunc cleanFunc);
+#define CLEANUP(func) ttest_cleanUp(&func)
 
 void ttest_beginTestSuite(const char *desc, int skip);
 void ttest_endTestSuite();
