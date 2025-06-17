@@ -1,3 +1,11 @@
+//
+// tinytest.h - tinytest-c is a lightweight, minimal, and simple testing framework
+//              for the C programming language.
+//
+// Repo: https://github.com/9takoyakii/tinytest-c
+// SPDX-License-Identifier: WTFPL
+//
+
 #ifndef __TINY_TEST_C
 #define __TINY_TEST_C
 
