@@ -10,6 +10,7 @@
 
 static ttest_cleanFunc *currCleanFunc = NULL;
 static int initialized = 0;
+static int concluded = 0;
 static int totalPass;
 static int totalFail;
 static int totalSkip;
@@ -34,7 +35,7 @@ static void updateStat(int pass, int fail, int skip) {
 
 void ttest_init() {
     if (initialized) {
-        ERROR("Don't call the ttest_init / INIT function twice");
+        ERROR("Don't call the ttest_init / INIT twice");
     }
 
     initialized = 1;
@@ -44,7 +45,7 @@ void ttest_init() {
 
 void ttest_clean(ttest_cleanFunc *cleanFunc) {
     if (currCleanFunc != NULL) {
-        ERROR("Don't call the ttest_clean / CLEAN function twice");
+        ERROR("Don't call the ttest_clean / CLEAN twice");
     }
 
     currCleanFunc = cleanFunc;
@@ -204,7 +205,10 @@ void ttest_endTest() {
 void ttest_conclude() {
     if (!initialized) {
         ERROR(NOT_INITIALIZED_ERROR_MESSAGE);
-        return;
+    }
+
+    if (concluded) {
+        ERROR("Don't call the ttest_conclude / CONCLUDE twice");
     }
 
     if (testSuiteStack.len != 0) {
@@ -220,8 +224,8 @@ void ttest_conclude() {
         duration
     );
 
-    // initialized = 0;
-    // free(testSuiteStack.ptr);
+    concluded = 1;
+    free(testSuiteStack.ptr);
 }
 
 int ttest_assert(int expr) {
