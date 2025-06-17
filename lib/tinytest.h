@@ -62,7 +62,7 @@ void ttest_endTest();
 void ttest_conclude();
 #define CONCLUDE() ttest_conclude();
 
-void ttest_assert(int expr);
+int ttest_assert(int expr);
 #define ASSERT(expr) ttest_assert(expr);
 
 

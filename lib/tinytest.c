@@ -224,7 +224,7 @@ void ttest_conclude() {
     // free(testSuiteStack.ptr);
 }
 
-void ttest_assert(int expr) {
+int ttest_assert(int expr) {
     if (!initialized) {
         ERROR(NOT_INITIALIZED_ERROR_MESSAGE);
     }
@@ -239,4 +239,5 @@ void ttest_assert(int expr) {
     }
 
     currTestSuite->test.status = expr ^ currTestSuite->test.failAsPassFlag ? ttest_PASS : ttest_FAIL;
+    return expr;
 }
