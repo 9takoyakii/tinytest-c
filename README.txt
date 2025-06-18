@@ -12,11 +12,14 @@ Initializes the testing framework. Must be called once before any other function
 --- INIT()
 Macro alias for ttest_init().
 
---- void ttest_clean(void func(const struct ttest_Test *test))
-Registers a cleanup function that will always be run after a test is completed.
+--- void ttest_cleanUp(void func(const struct ttest_Test *test), int onlyForThis)
+Registers a cleanup function that will always be run after the test is complete. If onlyForThis = 1, then the cleanup function will only be run in the describe where the cleanUp function is registered (if outside the describe block, then this will be ignored).
 
---- CLEAN(func)
-Macro alias for ttest_clean(func).
+--- CLEANUP(func)
+Macro alias for ttest_clean(func, 0).
+
+--- CLEANUP_THIS(func)
+Macro alias for ttest_clean(func, 1).
 
 --- void ttest_beginTestSuite(const char *desc, int skip)
 Starts an individual test with a description. If failAsPassFlag = 1, then a failed test will be considered successful and vice versa. If skip = 1, the test will be marked as skipped, but the next instruction will still be executed.
@@ -45,8 +48,8 @@ Defines a test case that will be skipped. The block will not be executed.
 --- IT_FAIL(desc, block)
 Defines a test case where if it fails it will be considered successful and vice versa.
 
---- void ttest_conclude()
-Prints the test results summary. Must be called once at the end.
+--- int ttest_conclude()
+Prints the test results summary. Must be called once at the end. The function also returns an exit code, 1 if any one failed and 0 if all passed.
 
 --- CONCLUDE()
 Macro alias for ttest_conclude().
@@ -74,9 +77,7 @@ int main() {
             ASSERT(log2(32) + sqrt(100) == 15);
         });
     });
-    CONCLUDE();
-
-    return 0;
+    return CONCLUDE();
 }
 ``
 
