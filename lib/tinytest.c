@@ -40,7 +40,7 @@ void ttest_init() {
     testSuiteStack.nextPtr = calloc(TEST_SUITE_MAX_DEPTH, sizeof(struct ttest_TestSuite));
 }
 
-void ttest_cleanUp(ttest_cleanupFunc *cleanFunc) {
+void ttest_cleanUp(ttest_cleanupFunc *cleanFunc, int onlyForThis) {
     if (testSuiteStack.len == 0) {
         rootcleanupFunc = cleanFunc;
     } else {
@@ -48,7 +48,8 @@ void ttest_cleanUp(ttest_cleanupFunc *cleanFunc) {
         if (currTestSuite->test.status != ttest_NONE) {
             ERROR("Don't call ttest_cleanUp / CLEANUP when test is running");
         }
-        currTestSuite->cleanupFunc = cleanFunc;
+        currTestSuite->cleanup.cleanupFunc = cleanFunc;
+        currTestSuite->cleanup.onlyForThis = !!onlyForThis;
     }
 }
 
@@ -186,8 +187,8 @@ void ttest_endTest() {
 
     for (size_t i = 1; i <= testSuiteStack.len; i++) {
         struct ttest_TestSuite *t = testSuiteStack.nextPtr - i;
-        if (t->cleanupFunc != NULL) {
-            t->cleanupFunc(&currTestSuite->test);
+        if (t->cleanup.cleanupFunc != NULL && !(i != 1 && t->cleanup.onlyForThis)) {
+            t->cleanup.cleanupFunc(&currTestSuite->test);
         }
     }
 
@@ -211,7 +212,7 @@ void ttest_endTest() {
     }
 }
 
-void ttest_conclude() {
+int ttest_conclude() {
     if (!initialized) {
         ERROR(NOT_INITIALIZED_ERROR_MESSAGE);
     }
@@ -222,7 +223,6 @@ void ttest_conclude() {
 
     if (testSuiteStack.len != 0) {
         ERROR("There is still a test suite running, call the ttest_conclude / CONCLUDE function only when all test suites have finished");
-        return;
     }
 
     long int duration = totalDuration;
@@ -235,6 +235,8 @@ void ttest_conclude() {
 
     concluded = 1;
     free(testSuiteStack.nextPtr);
+
+    return !!totalFail;
 }
 
 int ttest_assert(int expr) {

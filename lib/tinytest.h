@@ -4,7 +4,7 @@
 //
 // Repo: https://github.com/9takoyakii/tinytest-c
 // Version: 75cd8c1544a235b2883412207b16e37d5e7ba892
-// SPDX-License-Identifier: WTFP
+// SPDX-License-Identifier: WTFPL
 //
 
 #ifndef __TINY_TEST_C
@@ -37,7 +37,11 @@ struct ttest_TestSuite {
     int totalFail;
     int totalSkip;
     long totalDuration;
-    ttest_cleanupFunc *cleanupFunc;
+
+    struct {
+        ttest_cleanupFunc *cleanupFunc;
+        int onlyForThis;
+    } cleanup;
 };
 
 struct ttest_TestSuiteStack {
@@ -49,8 +53,9 @@ struct ttest_TestSuiteStack {
 void ttest_init();
 #define INIT() ttest_init()
 
-void ttest_cleanUp(ttest_cleanupFunc cleanFunc);
-#define CLEANUP(func) ttest_cleanUp(&func)
+void ttest_cleanUp(ttest_cleanupFunc cleanFunc, int thisOnly);
+#define CLEANUP(func) ttest_cleanUp(&func, 0)
+#define CLEANUP_THIS(func) ttest_cleanUp(&func, 1);
 
 void ttest_beginTestSuite(const char *desc, int skip);
 void ttest_endTestSuite();
@@ -69,7 +74,7 @@ void ttest_endTest();
     { block }; \
     ttest_endTest()
 
-void ttest_conclude();
+int ttest_conclude();
 #define CONCLUDE() ttest_conclude();
 
 int ttest_assert(int expr);
