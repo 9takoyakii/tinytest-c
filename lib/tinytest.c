@@ -4,7 +4,7 @@
 //
 // Repo: https://github.com/9takoyakii/tinytest-c
 // Version: 68d2b41c163f60b73415d456f1cd18d842e70ff4
-// SPDX-License-Identifier: WTFPL
+// SPDX-License-Identifier: MIT
 //
 
 #include <stdio.h>
