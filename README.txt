@@ -1,4 +1,4 @@
-What is tinytest-c:
+What is tinytest-c?
 ----------------------------
 Tinytest-c is a tiny and simple testing framework for the C programming language.
 
