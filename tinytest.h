@@ -12,8 +12,6 @@
 
 #include <stddef.h>
 
-// NOTE: Tests that are skipped are processed directly
-//       so test information is not stored in the test suite stack.
 enum ttest_TEST_STATUS {
     ttest_NONE,
     ttest_PASS,

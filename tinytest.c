@@ -185,7 +185,8 @@ void ttest_endTest() {
         ERROR("No test is running, call ttest_endTest if there is a test running");
     }
 
-    for (size_t i = 1; i <= testSuiteStack.len; i++) {
+    size_t i = 1;
+    for (; i <= testSuiteStack.len; i++) {
         struct ttest_TestSuite *t = testSuiteStack.nextPtr - i;
         if (t->cleanup.cleanupFunc != NULL && !(i != 1 && t->cleanup.onlyForThis)) {
             t->cleanup.cleanupFunc(&currTestSuite->test);
