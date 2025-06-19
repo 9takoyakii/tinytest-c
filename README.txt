@@ -5,7 +5,6 @@ It is designed to be easy to use, with no external dependencies, and has a very 
 
 
 @@ Functions and Macros
-
 --- void ttest_init()
 Initializes the testing framework. Must be called once before any other functions.
 
@@ -81,5 +80,5 @@ int main() {
 }
 ``
 
-== License
-Tinytest-c is licensed under the WTFPL 2.0 (Do What The F*ck You Want To Public License).
+@@ License
+Tinytest-c is licensed under the MIT License.
