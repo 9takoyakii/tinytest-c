@@ -1,67 +1,52 @@
-@@ What is tinytest-c
-tinytest-c is a lightweight, minimal, and simple testing framework for the C programming language.
+What is tinytest-c:
+----------------------------
+Tinytest-c is a lightweight, minimal, and simple testing framework for the C programming language.
 
 It is designed to be easy to use, with no external dependencies, and has a very small memory and code footprint — making it ideal for embedded systems or small C projects.
 
 
-@@ Functions and Macros
---- void ttest_init()
-Initializes the testing framework. Must be called once before any other functions.
+Functions & Macros:
+----------------------------
 
---- INIT()
-Macro alias for ttest_init().
+1. void ttest_init(): Initializes the testing framework. Must be called once before any other functions.
 
---- void ttest_cleanUp(void func(const struct ttest_Test *test), int onlyForThis)
-Registers a cleanup function that will always be run after the test is complete. If onlyForThis = 1, then the cleanup function will only be run in the describe where the cleanUp function is registered (if outside the describe block, then this will be ignored).
+2. INIT(): Macro alias for ttest_init().
 
---- CLEANUP(func)
-Macro alias for ttest_clean(func, 0).
+3. void ttest_cleanUp(void func(const struct ttest_Test *test), int onlyForThis): Registers a cleanup function that will always be run after the test is complete. If onlyForThis = 1, then the cleanup function will only be run in the describe where the cleanUp function is registered (if outside the describe block, then this will be ignored).
 
---- CLEANUP_THIS(func)
-Macro alias for ttest_clean(func, 1).
+4. CLEANUP(func): Macro alias for ttest_clean(func, 0).
 
---- void ttest_beginTestSuite(const char *desc, int skip)
-Starts an individual test with a description. If failAsPassFlag = 1, then a failed test will be considered successful and vice versa. If skip = 1, the test will be marked as skipped, but the next instruction will still be executed.
+5. CLEANUP_THIS(func): Macro alias for ttest_clean(func, 1).
 
---- void ttest_endTestSuite()
-Ends the current test suite.
+6. void ttest_beginTestSuite(const char *desc, int skip): Starts an individual test with a description. If failAsPassFlag = 1, then a failed test will be considered successful and vice versa. If skip = 1, the test will be marked as skipped, but the next instruction will still be executed.
 
---- DESCRIBE(desc, block)
-Macro to simplify test suite creation. Calls ttest_beginTestSuite(), runs the block, and then calls ttest_endTestSuite().
+7. void ttest_endTestSuite(): Ends the current test suite.
 
---- DESCRIBE_SKIP(desc, block)
-Creates a skipped test suite. The block will not be executed.
+8. DESCRIBE(desc, block): Macro to simplify test suite creation. Calls ttest_beginTestSuite(), runs the block, and then calls ttest_endTestSuite().
 
---- void ttest_beginTest(const char *desc, int failAsPassFlag, int skip)
-Begins a test case with a description. Allows flags to force pass or skip.
+9. DESCRIBE_SKIP(desc, block): Creates a skipped test suite. The block will not be executed.
 
---- void ttest_endTest()
-Ends the current test.
+10. void ttest_beginTest(const char *desc, int failAsPassFlag, int skip): Begins a test case with a description. Allows flags to force pass or skip.
 
---- IT(desc, block)
-Macro to define a test case.
+11. void ttest_endTest(): Ends the current test.
 
---- IT_SKIP(desc, block)
-Defines a test case that will be skipped. The block will not be executed.
+12. IT(desc, block): Macro to define a test case.
 
---- IT_FAIL(desc, block)
-Defines a test case where if it fails it will be considered successful and vice versa.
+13. IT_SKIP(desc, block): Defines a test case that will be skipped. The block will not be executed.
 
---- int ttest_conclude()
-Prints the test results summary. Must be called once at the end. The function also returns an exit code, 1 if any one failed and 0 if all passed.
+14. IT_FAIL(desc, block): Defines a test case where if it fails it will be considered successful and vice versa.
 
---- CONCLUDE()
-Macro alias for ttest_conclude().
+15. int ttest_conclude(): Prints the test results summary. Must be called once at the end. The function also returns an exit code, 1 if any one failed and 0 if all passed.
 
---- int ttest_assert(int expr)
-Evaluates the expression. If false, the test fails but execution keep continues.
+16. CONCLUDE(): Macro alias for ttest_conclude().
 
---- ASSERT(expr)
-Macro alias for ttest_assert(expr).
+17. int ttest_assert(int expr): Evaluates the expression. If false, the test fails but execution keep continues.
+
+18. ASSERT(expr): Macro alias for ttest_assert(expr).
 
 
-@@ Example
-```c
+Example:
+----------------------------
 #include "math.h"
 #include "tinytest.h"
 
@@ -78,7 +63,7 @@ int main() {
     });
     return CONCLUDE();
 }
-``
 
-@@ License
+License:
+----------------------------
 Tinytest-c is licensed under the MIT License.
