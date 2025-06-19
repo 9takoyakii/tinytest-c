@@ -1,6 +1,6 @@
 What is tinytest-c:
 ----------------------------
-Tinytest-c is a lightweight, minimal, and simple testing framework for the C programming language.
+Tinytest-c is a tiny and simple testing framework for the C programming language.
 
 It is designed to be easy to use, with no external dependencies, and has a very small memory and code footprint — making it ideal for embedded systems or small C projects.
 
