@@ -8,7 +8,7 @@ It is designed to be easy to use, with no external dependencies, and has a very 
 Functions & Macros:
 ----------------------------
 
-1. void ttest_init(): Initializes the testing framework. Must be called once before any other functions.
+1. void ttest_init(void): Initializes the testing framework. Must be called once before any other functions.
 
 2. INIT(): Macro alias for ttest_init().
 
@@ -20,7 +20,7 @@ Functions & Macros:
 
 6. void ttest_beginTestSuite(const char *desc, int skip): Starts an individual test with a description. If failAsPassFlag = 1, then a failed test will be considered successful and vice versa. If skip = 1, the test will be marked as skipped, but the next instruction will still be executed.
 
-7. void ttest_endTestSuite(): Ends the current test suite.
+7. void ttest_endTestSuite(void): Ends the current test suite.
 
 8. DESCRIBE(desc, block): Macro to simplify test suite creation. Calls ttest_beginTestSuite(), runs the block, and then calls ttest_endTestSuite().
 
@@ -28,7 +28,7 @@ Functions & Macros:
 
 10. void ttest_beginTest(const char *desc, int failAsPassFlag, int skip): Begins a test case with a description. Allows flags to force pass or skip.
 
-11. void ttest_endTest(): Ends the current test.
+11. void ttest_endTest(void): Ends the current test.
 
 12. IT(desc, block): Macro to define a test case.
 
@@ -36,7 +36,7 @@ Functions & Macros:
 
 14. IT_FAIL(desc, block): Defines a test case where if it fails it will be considered successful and vice versa.
 
-15. int ttest_conclude(): Prints the test results summary. Must be called once at the end. The function also returns an exit code, 1 if any one failed and 0 if all passed.
+15. int ttest_conclude(void): Prints the test results summary. Must be called once at the end. The function also returns an exit code, 1 if any one failed and 0 if all passed.
 
 16. CONCLUDE(): Macro alias for ttest_conclude().
 

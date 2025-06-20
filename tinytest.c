@@ -30,7 +30,7 @@ static struct ttest_TestSuiteStack testSuiteStack = {
     .nextPtr = NULL,
 };
 
-void ttest_init() {
+void ttest_init(void) {
     if (initialized) {
         ERROR("Don't call the ttest_init / INIT twice");
     }
@@ -92,7 +92,7 @@ void ttest_beginTestSuite(const char *desc, int skip) {
     testSuiteStack.len++;
 }
 
-void ttest_endTestSuite() {
+void ttest_endTestSuite(void) {
     if (!initialized) {
         ERROR(NOT_INITIALIZED_ERROR_MESSAGE);
     }
@@ -171,7 +171,7 @@ void ttest_beginTest(const char *desc, int failAsPassFlag, int skip) {
     );
 }
 
-void ttest_endTest() {
+void ttest_endTest(void) {
     if (!initialized) {
         ERROR(NOT_INITIALIZED_ERROR_MESSAGE);
     }
@@ -213,7 +213,7 @@ void ttest_endTest() {
     }
 }
 
-int ttest_conclude() {
+int ttest_conclude(void) {
     if (!initialized) {
         ERROR(NOT_INITIALIZED_ERROR_MESSAGE);
     }

@@ -48,7 +48,7 @@ struct ttest_TestSuiteStack {
     size_t len;
 };
 
-void ttest_init();
+void ttest_init(void);
 #define INIT() ttest_init()
 
 void ttest_cleanUp(ttest_cleanupFunc cleanFunc, int thisOnly);
@@ -56,14 +56,14 @@ void ttest_cleanUp(ttest_cleanupFunc cleanFunc, int thisOnly);
 #define CLEANUP_THIS(func) ttest_cleanUp(&func, 1);
 
 void ttest_beginTestSuite(const char *desc, int skip);
-void ttest_endTestSuite();
+void ttest_endTestSuite(void);
 #define DESCRIBE(desc, block) ttest_beginTestSuite(desc, 0); \
     { block }; \
     ttest_endTestSuite()
 #define DESCRIBE_SKIP(desc, block) ttest_beginTestSuite(desc, 1)
 
 void ttest_beginTest(const char *desc, int failAsPassFlag, int skip);
-void ttest_endTest();
+void ttest_endTest(void);
 #define IT(desc, block) ttest_beginTest(desc, 0, 0); \
     { block }; \
     ttest_endTest()
@@ -72,7 +72,7 @@ void ttest_endTest();
     { block }; \
     ttest_endTest()
 
-int ttest_conclude();
+int ttest_conclude(void);
 #define CONCLUDE() ttest_conclude();
 
 int ttest_assert(int expr);
