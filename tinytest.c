@@ -1,10 +1,11 @@
 /*
-    tinytest.c - tinytest-c is a lightweight, minimal, and simple testing framework
-                 for the C programming language.
-
-    Version: 1.0
-    Repository: https://github.com/9takoyakii/tinytest-c
-    SPDX-License-Identifier: MIT
+  * tinytest.c - tinytest-c is a lightweight, minimal, and simple testing framework
+  *              for the C programming language.
+  *
+  * Version: v2.0
+  * Repository: https://github.com/9takoyakii/tinytest-c
+  *
+  * SPDX-License-Identifier: MIT
 */
 
 #include <stdio.h>
@@ -211,6 +212,12 @@ void ttest_endTest(void) {
             printf("      # FAIL (%lums)\n", duration);
             currTestSuite->totalFail++;
     }
+}
+
+void ttest_test(const char *desc, int failAsPassFlag, int skip, ttest_testFunc test) {
+    ttest_beginTest(desc, failAsPassFlag, skip);
+    test(&(testSuiteStack.nextPtr - 1)->test);
+    ttest_endTest();
 }
 
 int ttest_conclude(void) {
