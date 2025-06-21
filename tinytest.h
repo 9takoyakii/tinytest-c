@@ -51,7 +51,7 @@ struct ttest_TestSuiteStack {
 };
 
 void ttest_init(void);
-#define INIT() ttest_init
+#define INIT() ttest_init()
 void ttest_cleanUp(ttest_cleanupFunc cleanFunc, int thisOnly);
 #define CLEANUP(func) ttest_cleanUp(func, 0);
 #define CLEANUP_THIS(func) ttest_cleanUp(func, 1);

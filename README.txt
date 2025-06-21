@@ -8,41 +8,80 @@ It is designed to be easy to use, with no external dependencies, and has a very 
 Functions & Macros:
 ----------------------------
 
-1. void ttest_init(void): Initializes the testing framework. Must be called once before any other functions.
+** void ttest_init(void):
+    Initializes the testing framework. Must be called once before using any other testing functions.
 
-2. INIT(): Macro alias for ttest_init().
+** INIT():
+    Macro alias for ttest_init().
 
-3. void ttest_cleanUp(void func(const struct ttest_Test *test), int onlyForThis): Registers a cleanup function that will always be run after the test is complete. If onlyForThis = 1, then the cleanup function will only be run in the describe where the cleanUp function is registered (if outside the describe block, then this will be ignored).
+** void ttest_cleanUp(void func(const struct ttest_Test *test), int onlyForThis):
+    Registers a cleanup function that will always be run after a test completes. If onlyForThis = 1, the cleanup function will only run for tests inside the current describe block. If called outside of a describe, the onlyForThis flag is ignored.
 
-4. CLEANUP(func): Macro alias for ttest_clean(func, 0).
+** CLEANUP(func):
+    Macro alias for ttest_cleanUp(func, 0).
 
-5. CLEANUP_THIS(func): Macro alias for ttest_clean(func, 1).
+** CLEANUP_THIS(func):
+    Macro alias for ttest_cleanUp(func, 1).
 
-6. void ttest_beginTestSuite(const char *desc, int skip): Starts an individual test with a description. If failAsPassFlag = 1, then a failed test will be considered successful and vice versa. If skip = 1, the test will be marked as skipped, but the next instruction will still be executed.
+** void ttest_beginTestSuite(const char *desc, int skip):
+    Starts a test suite with a description. If skip = 1, the suite is marked as skipped, but the code block will still be executed.
 
-7. void ttest_endTestSuite(void): Ends the current test suite.
+** void ttest_endTestSuite(void):
+    Ends the current test suite.
 
-8. DESCRIBE(desc, block): Macro to simplify test suite creation. Calls ttest_beginTestSuite(), runs the block, and then calls ttest_endTestSuite().
+** DESCRIBE_BEGIN(desc):
+    Macro to begin a test suite. Internally calls ttest_beginTestSuite(desc, 0).
 
-9. DESCRIBE_SKIP(desc, block): Creates a skipped test suite. The block will not be executed.
+** DESCRIBE_SKIP(desc):
+    Macro to create a skipped test suite. Internally calls ttest_beginTestSuite(desc, 1) and prevents execution of the block.
 
-10. void ttest_beginTest(const char *desc, int failAsPassFlag, int skip): Begins a test case with a description. Allows flags to force pass or skip.
+** DESCRIBE_END():
+    Macro to end a test suite. Internally calls ttest_endTestSuite().
 
-11. void ttest_endTest(void): Ends the current test.
+** void ttest_beginTest(const char *desc, int failAsPassFlag, int skip):
+    Begins a test case with a description. If failAsPassFlag = 1, a failure will be considered a success (and vice versa). If skip = 1, the test will be marked as skipped and the test body will not run.
 
-12. IT(desc, block): Macro to define a test case.
+** void ttest_endTest(void):
+    Ends the current test case.
 
-13. IT_SKIP(desc, block): Defines a test case that will be skipped. The block will not be executed.
+** IT_BEGIN(desc):
+    Macro to begin a normal test case. Internally calls ttest_beginTest(desc, 0, 0).
 
-14. IT_FAIL(desc, block): Defines a test case where if it fails it will be considered successful and vice versa.
+** IT_SKIP_BEGIN(desc):
+    Macro to begin a skipped test case. Internally calls ttest_beginTest(desc, 0, 1).
 
-15. int ttest_conclude(void): Prints the test results summary. Must be called once at the end. The function also returns an exit code, 1 if any one failed and 0 if all passed.
+** IT_FAIL_BEGIN(desc):
+    Macro to begin a test case where failure is treated as success. Internally calls ttest_beginTest(desc, 1, 0).
 
-16. CONCLUDE(): Macro alias for ttest_conclude().
+** IT_END(desc):
+    Macro to end a test case. Internally calls ttest_endTest().
 
-17. int ttest_assert(int expr): Evaluates the expression. If false, the test fails but execution keep continues.
+** void ttest_test(const char *desc, int failAsPassFlag, int skip, ttest_testFunc test):
+    Runs a test function with specified flags for forced pass/fail or skip behavior.
 
-18. ASSERT(expr): Macro alias for ttest_assert(expr).
+** IT(desc, func):
+    Macro to define and run a normal test function.
+
+** IT_SKIP(desc, func):
+    Macro to define and run a skipped test function. The test will be registered as skipped and will not be executed.
+
+** IT_FAIL(desc, func):
+    Macro to define and run a test function where failure is considered success.
+
+** int ttest_conclude(void):
+    Finalizes the test run, prints a summary of all results, and returns an exit code. Returns 1 if any test failed, 0 if all passed.
+
+** CONCLUDE():
+    Macro alias for ttest_conclude().
+
+** int ttest_assert(int expr):
+    Evaluates the expression. If false (i.e., 0), the test is marked as failed, but execution continues.
+
+** ASSERT(expr):
+    Macro alias for ttest_assert(expr).
+
+** ASSERT_N(expr):
+    Asserts that the expression is false. Internally evaluates !expr.
 
 
 Example:

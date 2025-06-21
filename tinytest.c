@@ -93,6 +93,8 @@ void ttest_beginTestSuite(const char *desc, int skip) {
     testSuiteStack.len++;
 }
 
+// endTestSuite will output the results to STDOUT and also add statistical information
+// to the previous testSuite or parentTestSuite
 void ttest_endTestSuite(void) {
     if (!initialized) {
         ERROR(NOT_INITIALIZED_ERROR_MESSAGE);
@@ -216,8 +218,12 @@ void ttest_endTest(void) {
 
 void ttest_test(const char *desc, int failAsPassFlag, int skip, ttest_testFunc test) {
     ttest_beginTest(desc, failAsPassFlag, skip);
-    test(&(testSuiteStack.nextPtr - 1)->test);
-    ttest_endTest();
+    if (!skip) {
+        // NOTE: || failAsPassFlag is added to prevent failure if return 0
+        //       (because if failAsPassFlag = 1 then if false (0) will fail).
+        ASSERT_N(test(&(testSuiteStack.nextPtr - 1)->test) || failAsPassFlag);
+        ttest_endTest();
+    }
 }
 
 int ttest_conclude(void) {
@@ -261,7 +267,11 @@ int ttest_assert(int expr) {
         ERROR("No test is running, call ttest_assert / ASSERT if there is a test running");
     }
 
-    int isPass = (currTestSuite->test.status == ttest_PASS) && (expr ^ currTestSuite->test.failAsPassFlag);
-    currTestSuite->test.status = isPass ? ttest_PASS : ttest_FAIL;
+    // isPass contains whether ASSERT is considered PASS or FAIL
+    // based on expr and failAsPassFlag
+    int isPass = expr ^ currTestSuite->test.failAsPassFlag;
+    currTestSuite->test.status = (isPass && currTestSuite->test.status == ttest_PASS)
+        ? ttest_PASS
+        : ttest_FAIL;
     return expr;
 }
