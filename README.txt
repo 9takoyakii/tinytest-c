@@ -39,7 +39,7 @@ Functions & Macros:
     Macro to end a test suite. Internally calls ttest_endTestSuite().
 
 ** void ttest_beginTest(const char *desc, int failAsPassFlag, int skip):
-    Begins a test case with a description. If failAsPassFlag = 1, a failure will be considered a success (and vice versa). If skip = 1, the test will be marked as skipped and the test body will not run.
+    Begins a test case with a description. If failAsPassFlag = 1, fail will be considered a pass (and vice versa). If skip = 1, the test will be marked as skipped and the test will not run (cleanup function also will not run).
 
 ** void ttest_endTest(void):
     Ends the current test case.
@@ -51,7 +51,7 @@ Functions & Macros:
     Macro to begin a skipped test case. Internally calls ttest_beginTest(desc, 0, 1).
 
 ** IT_FAIL_BEGIN(desc):
-    Macro to begin a test case where failure is treated as success. Internally calls ttest_beginTest(desc, 1, 0).
+    Macro to begin a test case where fail is treated as pass. Internally calls ttest_beginTest(desc, 1, 0).
 
 ** IT_END(desc):
     Macro to end a test case. Internally calls ttest_endTest().
@@ -66,7 +66,7 @@ Functions & Macros:
     Macro to define and run a skipped test function. The test will be registered as skipped and will not be executed.
 
 ** IT_FAIL(desc, func):
-    Macro to define and run a test function where failure is considered success.
+    Macro to define and run a test function where fail is considered pass and pass is considered fail.
 
 ** int ttest_conclude(void):
     Finalizes the test run, prints a summary of all results, and returns an exit code. Returns 1 if any test failed, 0 if all passed.
@@ -86,20 +86,51 @@ Functions & Macros:
 
 Example:
 ----------------------------
-#include "math.h"
+#include <stdio.h>
 #include "tinytest.h"
 
-int main() {
-    INIT();
-    DESCRIBE("Testing file math.c", {
-        IT("Testing 2 ** 5", {
-            ASSERT(pow(2, 5) == 32);
-        });
+void globalCleanup(const struct ttest_Test *test) {
+    printf("Cleaning up after test: %s\n", test->desc);
+}
 
-        IT("Testing log2(32) + sqrt(100)", {
-            ASSERT(log2(32) + sqrt(100) == 15);
-        });
-    });
+int test_addition(const struct ttest_Test *test) {
+    int result = 2 + 2;
+    ASSERT(result == 4);
+    return 0;
+}
+
+int test_subtraction(const struct ttest_Test *test) {
+    int result = 10 - 3;
+    ASSERT(result == 7);
+    ASSERT(result != 6);
+    return 0;
+}
+
+int test_fail(const struct ttest_Test *test) {
+    int x = 5;
+    ASSERT(x == 10);
+    return 0;
+}
+
+int test_skipped(const struct ttest_Test *test) {
+    ASSERT(1 == 0);
+    return 0;
+}
+
+int main(void) {
+    INIT();
+    CLEANUP(&globalCleanup);
+
+    DESCRIBE_BEGIN("Math Operations");
+        IT("Addition works", &test_addition);
+        IT("Subtraction works", &test_subtraction);
+    DESCRIBE_END();
+
+    DESCRIBE_BEGIN("Edge Cases");
+        IT_FAIL("Failure is expected", &test_fail);
+        IT_SKIP("Skipped test", &test_skipped);
+    DESCRIBE_END();
+
     return CONCLUDE();
 }
 
